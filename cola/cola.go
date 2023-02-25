@@ -1,4 +1,4 @@
-package pilabitacora
+package cola
 
 import (
 	est "estudiante"
@@ -8,48 +8,47 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
-	"time"
 )
 
 type Nodo struct {
-	next  *Nodo
-	value *est.Estudiante
-	fecha string
-	hora  string
+	next   *Nodo
+	before *Nodo
+	value  *est.Estudiante
 }
 
-type Pila struct {
+type Cola struct {
 	cabeza *Nodo
+	cola   *Nodo
 }
 
 // Constructores
 
-func NuevaPila() *Pila {
-	p := new(Pila)
-	p.cabeza = nil
-	return p
+func New() *Cola {
+	l := new(Cola)
+	l.cabeza = nil
+	l.cola = nil
+	return l
 }
 
 // Insertar datos
 
-func (p *Pila) Push(e *est.Estudiante) {
-	now := time.Now()
+func (l *Cola) Add(estudiante *est.Estudiante) {
 	nodo := &Nodo{
-		value: e,
-		fecha: now.Format(time.Kitchen),
-		hora:  now.Format("2006-02-01"),
+		value: estudiante,
 	}
-	if p.cabeza == nil {
-		p.cabeza = nodo
+	if l.cabeza == nil {
+		l.cabeza = nodo
+		l.cola = nodo
 	} else {
-		nodo.next = p.cabeza
-		p.cabeza = nodo
+		nodo.next = l.cabeza
+		l.cabeza.before = nodo
+		l.cabeza = nodo
 	}
 }
 
 // Verificar datos
 
-func (l *Pila) Size() int {
+func (l *Cola) Size() int {
 	actual := l.cabeza
 	tamanio := 0
 	for actual != nil {
@@ -59,7 +58,7 @@ func (l *Pila) Size() int {
 	return tamanio
 }
 
-func (l *Pila) Exist(carnet string) bool {
+func (l *Cola) Exist(carnet string) bool {
 	nodoActual := l.cabeza
 	for nodoActual != nil {
 		if nodoActual.value.GetCarnet() == carnet {
@@ -70,31 +69,107 @@ func (l *Pila) Exist(carnet string) bool {
 	return false
 }
 
-func (p *Pila) Print() {
+func (l *Cola) Print() {
 
-	if p.cabeza == nil {
-		fmt.Println("Pila vacía")
+	if l.cabeza == nil {
+		fmt.Println("Cola vacía")
 		return
 	}
+	nodoActual := l.cabeza
 
-	actual := p.cabeza
-
-	for actual != nil {
-		actual.value.Print()
-		actual = actual.next
+	for nodoActual != nil {
+		nodoActual.value.Print()
+		nodoActual = nodoActual.next
 		fmt.Printf("%s\n", strings.Repeat("-", 45))
 	}
 }
 
 // Eleminar datos
 
-func (p *Pila) Pop() *est.Estudiante {
-	if p.cabeza == nil {
+func (l *Cola) Pop() *est.Estudiante {
+	if l.cola == nil {
 		return nil
 	}
-	e := p.cabeza.value
-	p.cabeza = p.cabeza.next
-	return e
+	estudiante := l.cola.value
+	if l.cabeza == l.cola {
+		l.cabeza = nil
+		l.cola = nil
+	} else {
+		l.cola = l.cola.before
+		l.cola.next = nil
+	}
+	return estudiante
+}
+
+// Ordenamiento
+
+func (l *Cola) SortByName() {
+	if l.cabeza == nil {
+		return
+	}
+	ordenado := false
+	for !ordenado {
+		ordenado = true
+		nodoActual := l.cabeza
+		for nodoActual.next != nil {
+			if nodoActual.value.GetNombre() > nodoActual.next.value.GetNombre() {
+				// Intercambiar los nodos
+				nodoSiguiente := nodoActual.next
+				nodoAnterior := nodoActual.before
+				nodoSiguiente.before = nodoAnterior
+				if nodoAnterior != nil {
+					nodoAnterior.next = nodoSiguiente
+				} else {
+					l.cabeza = nodoSiguiente
+				}
+				nodoActual.next = nodoSiguiente.next
+				if nodoSiguiente.next != nil {
+					nodoSiguiente.next.before = nodoActual
+				} else {
+					l.cola = nodoActual
+				}
+				nodoSiguiente.next = nodoActual
+				nodoActual.before = nodoSiguiente
+				nodoActual = nodoSiguiente
+				ordenado = false
+			}
+			nodoActual = nodoActual.next
+		}
+	}
+}
+func (l *Cola) SortByCarnet() {
+	if l.cabeza == nil {
+		return
+	}
+	ordenado := false
+	for !ordenado {
+		ordenado = true
+		nodoActual := l.cabeza
+		for nodoActual.next != nil {
+			if nodoActual.value.GetCarnet() > nodoActual.next.value.GetCarnet() {
+				// Intercambiar los nodos
+				nodoSiguiente := nodoActual.next
+				nodoAnterior := nodoActual.before
+				nodoSiguiente.before = nodoAnterior
+				if nodoAnterior != nil {
+					nodoAnterior.next = nodoSiguiente
+				} else {
+					l.cabeza = nodoSiguiente
+				}
+				nodoActual.next = nodoSiguiente.next
+				if nodoSiguiente.next != nil {
+					nodoSiguiente.next.before = nodoActual
+				} else {
+					l.cola = nodoActual
+				}
+				nodoSiguiente.next = nodoActual
+				nodoActual.before = nodoSiguiente
+				nodoActual = nodoSiguiente
+				ordenado = false
+			}
+			nodoActual = nodoActual.next
+		}
+	}
 }
 
 // Creación archivos dot
@@ -140,7 +215,7 @@ func ejecutar(nombre_imagen string, archivo_dot string) {
 	_ = ioutil.WriteFile(nombre_imagen, cmd, os.FileMode(mode))
 }
 
-func (l *Pila) Graficar() {
+func (l *Cola) Graficar() {
 	fmt.Println("Impresion")
 	nombre_archivo_dot := "./lista.dot"
 	nombre_imagen := "lista.jpg"

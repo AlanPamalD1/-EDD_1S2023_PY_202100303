@@ -1,5 +1,4 @@
 # EDD GoDrive | Proyecto 1
-### Estructura de Datos
 
 <div align="center">
 
@@ -7,7 +6,9 @@
 
 </div>
 
-> 👤 *Creado por **`Alan Pamal`***
+### Estructura de Datos
 
-Aplicación manejada por consola para el manejo de usuarios y representación gráfica y por reportes JSON.
+> 👤 *Creado por **`Alan Rodrigo Pamal De León`***
+
+Aplicación manejada por consola para el manejo de usuarios de la Facultad de Ingeniería de la Universidad de San Carlos de Guatemala, su representación gráfica por medio de grafos y reportes JSON.
 

@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	cl "cola"
 	est "estudiante"
 	"fmt"
 	"io"
@@ -14,8 +15,8 @@ import (
 var USER_ADMIN = "admin"
 var PWD_ADMIN = "12345"
 
-var COLA_PENDIENTES = lde.New()
-var COLA_SISTEMA = lde.New()
+var COLA_PENDIENTES = cl.New()
+var LISTA_SISTEMA = lde.New()
 
 func main() {
 	//printMenuInicioSesion()
@@ -44,7 +45,7 @@ loopMenu:
 		case 2:
 			//Ver estudiantes del sistema
 			fmt.Printf("********** %s ***********\n", "Estudiantes en Sistema")
-			COLA_SISTEMA.Print()
+			LISTA_SISTEMA.Print()
 			fmt.Printf("%s\n", strings.Repeat("*", 45))
 		case 3:
 			//Registrar nuevo estudiante
@@ -112,7 +113,7 @@ loopMenu:
 			objeto := est.New(nombre, apellido, carnet, password)
 
 			//Agregado lista espera
-			COLA_PENDIENTES.AddLast(objeto)
+			COLA_PENDIENTES.Add(objeto)
 			fmt.Println("Estudiante agregado a lista de espera...")
 		case 4:
 			//carga masiva

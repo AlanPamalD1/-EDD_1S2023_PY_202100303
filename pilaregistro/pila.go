@@ -1,4 +1,4 @@
-package pilabitacora
+package pilaregistro
 
 import (
 	est "estudiante"
@@ -12,10 +12,11 @@ import (
 )
 
 type Nodo struct {
-	next  *Nodo
-	value *est.Estudiante
-	fecha string
-	hora  string
+	next       *Nodo
+	value      *est.Estudiante
+	fecha      string
+	hora       string
+	aceptacion string
 }
 
 type Pila struct {
@@ -32,12 +33,17 @@ func NuevaPila() *Pila {
 
 // Insertar datos
 
-func (p *Pila) Push(e *est.Estudiante) {
+func (p *Pila) Push(e *est.Estudiante, estado bool) {
 	now := time.Now()
+	aceptacion := "rechazó"
+	if estado {
+		aceptacion = "aceptó"
+	}
 	nodo := &Nodo{
-		value: e,
-		fecha: now.Format(time.Kitchen),
-		hora:  now.Format("2006-02-01"),
+		value:      e,
+		fecha:      now.Format(time.Kitchen),
+		hora:       now.Format("2006-02-01"),
+		aceptacion: aceptacion,
 	}
 	if p.cabeza == nil {
 		p.cabeza = nodo
@@ -152,8 +158,8 @@ func (l *Pila) Graficar() {
 	auxiliar := l.cabeza
 	contador := 0
 	for i := 0; i < l.Size(); i++ {
-		texto += fmt.Sprintf("nodo %s[label=\"{| %s\n%s |}\"];\n", strconv.Itoa(i), auxiliar.value.GetCarnet(), auxiliar.value.GetNombre())
-		//texto = texto + "nodo" + strconv.Itoa(i) + "[label=\"{|" + "valor: " + ", " + auxiliar.value.GetNombre() + "|}\"];\n"
+		texto += fmt.Sprintf("nodo %s [label=\"{| Se %s a\n%s\n %s %s |}\"];\n", strconv.Itoa(i), auxiliar.aceptacion, auxiliar.value.GetNombre(), auxiliar.fecha, auxiliar.hora)
+		//texto = texto + "nodo" + strconv.Itoa(i) + "[label=\"{|" + "Se "+auxiliar.aceptacion+" a\n"+auxiliar.value.GetNombre()+"\n"+auxiliar.fecha +""+auxiliar.hora+ "|}\"];\n"
 		auxiliar = auxiliar.next
 	}
 	texto += "nodonull1->nodo0 [dir=back];\n"

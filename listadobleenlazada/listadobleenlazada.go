@@ -317,7 +317,8 @@ func (l *ListaDoble) Graficar() {
 	auxiliar := l.cabeza
 	contador := 0
 	for i := 0; i < l.Size(); i++ {
-		texto = texto + "nodo" + strconv.Itoa(i) + "[label=\"{|" + "valor: " + ", " + auxiliar.value.GetNombre() + "|}\"];\n"
+		texto += fmt.Sprintf("nodo %s[label=\"{| %s\n%s |}\"];\n", strconv.Itoa(i), auxiliar.value.GetCarnet(), auxiliar.value.GetNombre())
+		//texto = texto + "nodo" + strconv.Itoa(i) + "[label=\"{|" + "valor: " + ", " + auxiliar.value.GetNombre() + "|}\"];\n"
 		auxiliar = auxiliar.next
 	}
 	texto += "nodonull1->nodo0 [dir=back];\n"
