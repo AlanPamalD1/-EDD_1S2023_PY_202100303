@@ -9,21 +9,30 @@ import (
 	lde "listadobleenlazada"
 	"os"
 	"os/exec"
+	plreg "pilaregistro"
 	"strings"
 )
 
 var USER_ADMIN = "admin"
-var PWD_ADMIN = "12345"
+var PWD_ADMIN = "admin"
 
 var COLA_PENDIENTES = cl.New()
 var LISTA_SISTEMA = lde.New()
+var PILA_REGISTRO = plreg.New()
 
 //Estudiantes de prueba
 
 func main() {
 	//printMenuInicioSesion()
+
 	pruebaEst := est.New("Alan Rodrigo", "Pamal De León", "202100303", "12345")
+	pruebaEst2 := est.New("Diego Eduardo", "Cifuentes dardon", "202100304", "54321")
+	pruebaEst3 := est.New("Luis Alejandro", "Perez Borja", "202100305", "00000")
+	pruebaEst4 := est.New("Sergio Alejandro", "García nose", "202100302", "panqueue")
+	COLA_PENDIENTES.Add(pruebaEst4)
 	COLA_PENDIENTES.Add(pruebaEst)
+	COLA_PENDIENTES.Add(pruebaEst2)
+	COLA_PENDIENTES.Add(pruebaEst3)
 	printMenuAdmin()
 }
 
@@ -44,9 +53,10 @@ loopMenu:
 		switch option {
 		case 1:
 			//Ver estudiantes pendientes
-			fmt.Printf("********** %s ***********\n", "Estudiantes Pendientes")
+			fmt.Printf("********** %s ***********\n", "Estudiantes en Sistema")
 			COLA_PENDIENTES.Print()
 			fmt.Printf("%s\n", strings.Repeat("*", 45))
+			aceptarEstudiantes()
 		case 2:
 			//Ver estudiantes del sistema
 			fmt.Printf("********** %s ***********\n", "Estudiantes en Sistema")
@@ -121,7 +131,6 @@ loopMenu:
 			COLA_PENDIENTES.Add(objeto)
 
 			fmt.Println("Estudiante agregado a lista de espera ...")
-
 		case 4:
 			//carga masiva
 		case 5:
@@ -138,6 +147,51 @@ loopMenu:
 
 }
 
+func aceptarEstudiantes() {
+	option := 0
+
+	if COLA_PENDIENTES.Size() == 0 {
+		fmt.Println("Cola vacía")
+	}
+loop:
+	for COLA_PENDIENTES.Size() > 0 {
+		fmt.Printf("\n************** Estudiantes pendientes: %d ****************\n", (COLA_PENDIENTES.Size()))
+		estudianteActual := COLA_PENDIENTES.Get(0)
+		fmt.Printf("Estudiante actual: %s %s\n", estudianteActual.GetNombre(), estudianteActual.GetApellido())
+		fmt.Println("1. Aceptar al Estudiante")
+		fmt.Println("2. Rechazar al Estudiante")
+		fmt.Println("3. Volver al Menu")
+		fmt.Printf("%s\n", strings.Repeat("-", 55))
+		fmt.Print("Elige una opción: ")
+		fmt.Scanln(&option)
+
+		switch option {
+		case 1:
+			//Aceptar estudiante
+			COLA_PENDIENTES.Dequeue()
+			LISTA_SISTEMA.AddFirst(estudianteActual)
+			LISTA_SISTEMA.SortByCarnet()
+			PILA_REGISTRO.Push(estudianteActual, true)
+			fmt.Printf("Se agregó a %s %s al sistema \n", estudianteActual.GetNombre(), estudianteActual.GetApellido())
+		case 2:
+			//Rechazar
+			COLA_PENDIENTES.Dequeue()
+			PILA_REGISTRO.Push(estudianteActual, false)
+			fmt.Printf("Se rechazó a %s %s\n", estudianteActual.GetNombre(), estudianteActual.GetApellido())
+		case 3:
+			//Salir
+			fmt.Println("~~~~ Regresando ~~~~")
+			break loop
+		default:
+			fmt.Println("Opción no válida")
+			fmt.Println("~~~~ Regresando ~~~~")
+			break loop
+		}
+	}
+
+	fmt.Printf("%s\n", strings.Repeat("*", 57))
+}
+
 func printMenuReportes() {
 loopMenu:
 	for {
@@ -146,23 +200,43 @@ loopMenu:
 		fmt.Printf("****** %s *******\n", "Área de Reportes - EDD GoDrive")
 		fmt.Printf("*         %s          *\n", "1. Estudiantes Aceptados")
 		fmt.Printf("*         %s          *\n", "2. Estudiantes en Espera")
-		fmt.Printf("*                 %s                   *\n", "3. JSON")
-		fmt.Printf("*                %s                *\n", "4. Regresar")
+		fmt.Printf("*         %s          *\n", "3. Reporte Administrador")
+		fmt.Printf("*                 %s                   *\n", "4. JSON")
+		fmt.Printf("*                %s                *\n", "5. Regresar")
 		fmt.Printf("%s\n", strings.Repeat("*", 45))
 		fmt.Scanln(&option)
 		switch option {
 		case 1:
 			//lista estudiantes aceptados
+			if LISTA_SISTEMA.Size() > 0 {
+				nombreArchivo := "Lista_Sistema"
+				LISTA_SISTEMA.Graficar(nombreArchivo)
+				//openImage(nombreArchivo)
+			} else {
+				fmt.Println("Lista vacía")
+			}
 		case 2:
 			//cola estudiantes en espera
-
-			nombreArchivo := "Cola espera"
-			COLA_PENDIENTES.Graficar(nombreArchivo)
-			openImage(nombreArchivo)
+			if COLA_PENDIENTES.Size() > 0 {
+				nombreArchivo := "Cola_Espera"
+				COLA_PENDIENTES.Graficar(nombreArchivo)
+				//openImage(nombreArchivo)
+			} else {
+				fmt.Println("Cola vacía")
+			}
 		case 3:
+			//reporte Administrador
+			if PILA_REGISTRO.Size() > 0 {
+				nombreArchivo := "Pila_Registro"
+				PILA_REGISTRO.Graficar(nombreArchivo)
+				//openImage(nombreArchivo)
+			} else {
+				fmt.Println("Pila vacía")
+			}
+		case 4:
 			//reporte en JSON
 
-		case 4:
+		case 5:
 			//Regresar al menu administrador
 			fmt.Println("~~~~ Regresando ~~~~")
 			break loopMenu

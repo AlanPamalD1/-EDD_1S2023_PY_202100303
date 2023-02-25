@@ -275,7 +275,6 @@ func crearArchivoDot(nombre_archivo string) {
 		}
 		defer file.Close()
 	}
-	fmt.Println("Archivo creado exitosamente", nombre_archivo)
 }
 
 func escribirArchivoDot(contenido string, nombre_archivo string) {
@@ -295,7 +294,7 @@ func escribirArchivoDot(contenido string, nombre_archivo string) {
 	if err != nil {
 		return
 	}
-	fmt.Println("Archivo actualizado existosamente.")
+	fmt.Printf("Archivo %s creado exitosamente\n", nombre_archivo)
 }
 
 func ejecutar(nombre_imagen string, archivo_dot string) {
@@ -306,7 +305,6 @@ func ejecutar(nombre_imagen string, archivo_dot string) {
 }
 
 func (l *ListaDoble) Graficar(nombreArchivo string) {
-	fmt.Println("Impresion")
 	nombre_archivo_dot := fmt.Sprintf("./%s.dot", nombreArchivo)
 	nombre_imagen := fmt.Sprintf("%s.jpg", nombreArchivo)
 	texto := "digraph lista{\n"
@@ -317,8 +315,7 @@ func (l *ListaDoble) Graficar(nombreArchivo string) {
 	auxiliar := l.cabeza
 	contador := 0
 	for i := 0; i < l.Size(); i++ {
-		texto += fmt.Sprintf("nodo%s[label=\"{|%s\\n%s|}\"];\n", strconv.Itoa(i), auxiliar.value.GetCarnet(), auxiliar.value.GetNombre())
-		//texto = texto + "nodo" + strconv.Itoa(i) + "[label=\"{|" + "valor: " + ", " + auxiliar.value.GetNombre() + "|}\"];\n"
+		texto += fmt.Sprintf("nodo%s[label=\"{|%s\\n%s %s|}\"];\n", strconv.Itoa(i), auxiliar.value.GetCarnet(), auxiliar.value.GetNombre(), auxiliar.value.GetApellido())
 		auxiliar = auxiliar.next
 	}
 	texto += "nodonull1->nodo0 [dir=back];\n"

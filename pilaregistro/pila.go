@@ -25,7 +25,7 @@ type Pila struct {
 
 // Constructores
 
-func NuevaPila() *Pila {
+func New() *Pila {
 	p := new(Pila)
 	p.cabeza = nil
 	return p
@@ -41,8 +41,8 @@ func (p *Pila) Push(e *est.Estudiante, estado bool) {
 	}
 	nodo := &Nodo{
 		value:      e,
-		fecha:      now.Format(time.Kitchen),
-		hora:       now.Format("2006-02-01"),
+		fecha:      now.Format("2006-02-01"),
+		hora:       now.Format(time.Kitchen),
 		aceptacion: aceptacion,
 	}
 	if p.cabeza == nil {
@@ -116,7 +116,6 @@ func crearArchivoDot(nombre_archivo string) {
 		}
 		defer file.Close()
 	}
-	fmt.Println("Archivo creado exitosamente", nombre_archivo)
 }
 
 func escribirArchivoDot(contenido string, nombre_archivo string) {
@@ -136,7 +135,7 @@ func escribirArchivoDot(contenido string, nombre_archivo string) {
 	if err != nil {
 		return
 	}
-	fmt.Println("Archivo actualizado existosamente.")
+	fmt.Printf("Archivo %s creado exitosamente\n", nombre_archivo)
 }
 
 func ejecutar(nombre_imagen string, archivo_dot string) {
@@ -147,29 +146,20 @@ func ejecutar(nombre_imagen string, archivo_dot string) {
 }
 
 func (l *Pila) Graficar(nombreArchivo string) {
-	fmt.Println("Impresion")
 	nombre_archivo_dot := fmt.Sprintf("./%s.dot", nombreArchivo)
 	nombre_imagen := fmt.Sprintf("%s.jpg", nombreArchivo)
 	texto := "digraph lista{\n"
-	texto += "rankdir=LR;\n"
-	texto += "node[shape = record];\n"
-	texto += "nodonull1[label=\"null\"];\n"
-	texto += "nodonull2[label=\"null\"];\n"
+	texto += "nodesep=0;\n"
+	texto += "rankdir=TB;\n"
+	texto += "node[shape = rectangle];\n"
 	auxiliar := l.cabeza
-	contador := 0
 	for i := 0; i < l.Size(); i++ {
-		texto += fmt.Sprintf("nodo%s[label=\"{|Se %s a\\n%s\\n %s %s|}\"];\n", strconv.Itoa(i), auxiliar.aceptacion, auxiliar.value.GetNombre(), auxiliar.fecha, auxiliar.hora)
-		//texto = texto + "nodo" + strconv.Itoa(i) + "[label=\"{|" + "Se "+auxiliar.aceptacion+" a\n"+auxiliar.value.GetNombre()+"\n"+auxiliar.fecha +""+auxiliar.hora+ "|}\"];\n"
+		texto += fmt.Sprintf("nodo%s[label=\"Se %s a\\n%s %s\\n %s %s\"];\n", strconv.Itoa(i), auxiliar.aceptacion, auxiliar.value.GetNombre(), auxiliar.value.GetApellido(), auxiliar.fecha, auxiliar.hora)
 		auxiliar = auxiliar.next
 	}
-	texto += "nodonull1->nodo0 [dir=back];\n"
 	for i := 0; i < l.Size()-1; i++ {
-		c := i + 1
-		texto += "nodo" + strconv.Itoa(i) + "->nodo" + strconv.Itoa(c) + ";\n"
-		//texto += "nodo" + strconv.Itoa(c) + "->nodo" + strconv.Itoa(i) + ";\n"
-		contador = c
+		texto += "nodo" + strconv.Itoa(i) + "->nodo" + strconv.Itoa(i+1) + ";\n"
 	}
-	texto += "nodo" + strconv.Itoa(contador) + "->nodonull2;\n"
 	texto += "}"
 
 	crearArchivoDot(nombre_archivo_dot)
