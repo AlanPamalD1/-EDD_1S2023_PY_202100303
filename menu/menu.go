@@ -18,8 +18,12 @@ var PWD_ADMIN = "12345"
 var COLA_PENDIENTES = cl.New()
 var LISTA_SISTEMA = lde.New()
 
+//Estudiantes de prueba
+
 func main() {
 	//printMenuInicioSesion()
+	pruebaEst := est.New("Alan Rodrigo", "Pamal De León", "202100303", "12345")
+	COLA_PENDIENTES.Add(pruebaEst)
 	printMenuAdmin()
 }
 
@@ -33,7 +37,8 @@ loopMenu:
 		fmt.Printf("*       %s      *\n", "2. Ver Estudiantes del Sistema")
 		fmt.Printf("*       %s       *\n", "3. Registrar Nuevo Estudiante")
 		fmt.Printf("*       %s      *\n", "4. Carga Masiva de Estudiantes")
-		fmt.Printf("*              %s             *\n", "5. Cerrar Sesión")
+		fmt.Printf("*                %s                *\n", "5. Reportes")
+		fmt.Printf("*              %s             *\n", "6. Cerrar Sesión")
 		fmt.Printf("%s\n", strings.Repeat("*", 45))
 		fmt.Scanln(&option)
 		switch option {
@@ -114,18 +119,57 @@ loopMenu:
 
 			//Agregado lista espera
 			COLA_PENDIENTES.Add(objeto)
-			fmt.Println("Estudiante agregado a lista de espera...")
+
+			fmt.Println("Estudiante agregado a lista de espera ...")
+
 		case 4:
 			//carga masiva
 		case 5:
+			//Menu de reportes
+			printMenuReportes()
+		case 6:
 			//Cerrar sesión
-			fmt.Println("Cerrando sesión")
+			fmt.Println("~~~~ Cerrando sesión ~~~~")
 			break loopMenu
 		default:
 			fmt.Println("Ingrese una opcíon válida")
 		}
 	}
 
+}
+
+func printMenuReportes() {
+loopMenu:
+	for {
+		option := 0
+		fmt.Println()
+		fmt.Printf("****** %s *******\n", "Área de Reportes - EDD GoDrive")
+		fmt.Printf("*         %s          *\n", "1. Estudiantes Aceptados")
+		fmt.Printf("*         %s          *\n", "2. Estudiantes en Espera")
+		fmt.Printf("*                 %s                   *\n", "3. JSON")
+		fmt.Printf("*                %s                *\n", "4. Regresar")
+		fmt.Printf("%s\n", strings.Repeat("*", 45))
+		fmt.Scanln(&option)
+		switch option {
+		case 1:
+			//lista estudiantes aceptados
+		case 2:
+			//cola estudiantes en espera
+
+			nombreArchivo := "Cola espera"
+			COLA_PENDIENTES.Graficar(nombreArchivo)
+			openImage(nombreArchivo)
+		case 3:
+			//reporte en JSON
+
+		case 4:
+			//Regresar al menu administrador
+			fmt.Println("~~~~ Regresando ~~~~")
+			break loopMenu
+		default:
+			fmt.Println("Ingrese una opcíon válida")
+		}
+	}
 }
 
 func printMenuInicioSesion() {
@@ -184,14 +228,13 @@ loopMenu:
 			}
 		case 2:
 			//Salir del sistema
-			fmt.Println("Saliendo del sistema ...")
-			fmt.Println("Hasta la próxima")
+			fmt.Println("~~~~ Saliendo del sistema ~~~~")
+			fmt.Println(" Hasta la próxima ")
 			break loopMenu
 		default:
 			fmt.Println("Ingrese una opcíon válida")
 		}
 	}
-
 }
 
 func scanString(s *bufio.Scanner) (string, error) {
@@ -205,9 +248,13 @@ func scanString(s *bufio.Scanner) (string, error) {
 	return "", err
 }
 
-func openImage() {
-	path, _ := exec.LookPath("display")
-	cmd, err := exec.Command(path, "lista.jpg").Output()
+func openImage(nombreArchivo string) {
+
+	fmt.Printf("Abriendo el archivo %s.jpg\n", nombreArchivo)
+	path, _ := exec.LookPath("jpg")
+	nombreImagen := fmt.Sprintf("%s.jpg", nombreArchivo)
+	fmt.Println("ruta ", path, nombreImagen)
+	cmd, err := exec.Command(path, nombreImagen).Output()
 	if err != nil {
 		fmt.Println("error: ", err)
 	}

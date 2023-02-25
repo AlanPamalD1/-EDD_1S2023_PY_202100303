@@ -215,11 +215,11 @@ func ejecutar(nombre_imagen string, archivo_dot string) {
 	_ = ioutil.WriteFile(nombre_imagen, cmd, os.FileMode(mode))
 }
 
-func (l *Cola) Graficar() {
+func (l *Cola) Graficar(nombreArchivo string) {
 	fmt.Println("Impresion")
-	nombre_archivo_dot := "./lista.dot"
-	nombre_imagen := "lista.jpg"
-	texto := "digraph lista{\n"
+	nombre_archivo_dot := fmt.Sprintf("./%s.dot", nombreArchivo)
+	nombre_imagen := fmt.Sprintf("%s.jpg", nombreArchivo)
+	texto := "digraph cola{\n"
 	texto += "rankdir=LR;\n"
 	texto += "node[shape = record];\n"
 	texto += "nodonull1[label=\"null\"];\n"
@@ -227,8 +227,8 @@ func (l *Cola) Graficar() {
 	auxiliar := l.cabeza
 	contador := 0
 	for i := 0; i < l.Size(); i++ {
-		texto += fmt.Sprintf("nodo %s[label=\"{| %s\n%s |}\"];\n", strconv.Itoa(i), auxiliar.value.GetCarnet(), auxiliar.value.GetNombre())
-		//texto = texto + "nodo" + strconv.Itoa(i) + "[label=\"{|" + "valor: " + ", " + auxiliar.value.GetNombre() + "|}\"];\n"
+		//texto = texto + fmt.Sprintf("nodo%s[label=\"{|%s %s|}\"];\n", strconv.Itoa(i), auxiliar.value.GetCarnet(), auxiliar.value.GetNombre())
+		texto += fmt.Sprintf("nodo%s[label=\"{|%s\\n%s|}\"];\n", strconv.Itoa(i), auxiliar.value.GetCarnet(), auxiliar.value.GetNombre())
 		auxiliar = auxiliar.next
 	}
 	texto += "nodonull1->nodo0 [dir=back];\n"

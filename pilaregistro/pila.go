@@ -146,10 +146,10 @@ func ejecutar(nombre_imagen string, archivo_dot string) {
 	_ = ioutil.WriteFile(nombre_imagen, cmd, os.FileMode(mode))
 }
 
-func (l *Pila) Graficar() {
+func (l *Pila) Graficar(nombreArchivo string) {
 	fmt.Println("Impresion")
-	nombre_archivo_dot := "./lista.dot"
-	nombre_imagen := "lista.jpg"
+	nombre_archivo_dot := fmt.Sprintf("./%s.dot", nombreArchivo)
+	nombre_imagen := fmt.Sprintf("%s.jpg", nombreArchivo)
 	texto := "digraph lista{\n"
 	texto += "rankdir=LR;\n"
 	texto += "node[shape = record];\n"
@@ -158,7 +158,7 @@ func (l *Pila) Graficar() {
 	auxiliar := l.cabeza
 	contador := 0
 	for i := 0; i < l.Size(); i++ {
-		texto += fmt.Sprintf("nodo %s [label=\"{| Se %s a\n%s\n %s %s |}\"];\n", strconv.Itoa(i), auxiliar.aceptacion, auxiliar.value.GetNombre(), auxiliar.fecha, auxiliar.hora)
+		texto += fmt.Sprintf("nodo%s[label=\"{|Se %s a\\n%s\\n %s %s|}\"];\n", strconv.Itoa(i), auxiliar.aceptacion, auxiliar.value.GetNombre(), auxiliar.fecha, auxiliar.hora)
 		//texto = texto + "nodo" + strconv.Itoa(i) + "[label=\"{|" + "Se "+auxiliar.aceptacion+" a\n"+auxiliar.value.GetNombre()+"\n"+auxiliar.fecha +""+auxiliar.hora+ "|}\"];\n"
 		auxiliar = auxiliar.next
 	}
