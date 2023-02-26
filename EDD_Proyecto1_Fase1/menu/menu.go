@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	cl "cola"
+	"encoding/csv"
 	est "estudiante"
 	"fmt"
 	"io"
@@ -24,15 +25,14 @@ var PILA_REGISTRO = plreg.New()
 //Estudiantes de prueba
 
 func main() {
-
-	pruebaEst := est.New("Alan Rodrigo", "Pamal De León", "202100303", "12345")
-	pruebaEst2 := est.New("Diego Eduardo", "Cifuentes dardon", "202100304", "54321")
-	pruebaEst3 := est.New("Luis Alejandro", "Perez Borja", "202100305", "00000")
-	pruebaEst4 := est.New("Sergio Alejandro", "García nose", "202100302", "panqueue")
-	COLA_PENDIENTES.Add(pruebaEst4)
-	COLA_PENDIENTES.Add(pruebaEst)
-	COLA_PENDIENTES.Add(pruebaEst2)
-	COLA_PENDIENTES.Add(pruebaEst3)
+	//pruebaEst := est.New("Alan Rodrigo", "Pamal De León", "202100303", "12345")
+	//pruebaEst2 := est.New("Diego Eduardo", "Cifuentes Mazariegos", "202100304", "54321")
+	//pruebaEst3 := est.New("Luis Alejandro", "Perez Borja", "202100305", "00000")
+	//pruebaEst4 := est.New("Sergio Alejandro", "García Nose", "202100302", "panqueue")
+	//COLA_PENDIENTES.Add(pruebaEst4)
+	//COLA_PENDIENTES.Add(pruebaEst)
+	//COLA_PENDIENTES.Add(pruebaEst2)
+	//COLA_PENDIENTES.Add(pruebaEst3)
 	//menuAdmin()
 	menuInicioSesion()
 }
@@ -61,7 +61,6 @@ loopMenu:
 			} else {
 				fmt.Println("No hay estudiante pendientes")
 			}
-
 		case 2:
 			if LISTA_SISTEMA.Size() > 0 {
 				//Ver estudiantes del sistema
@@ -71,7 +70,6 @@ loopMenu:
 			} else {
 				fmt.Println("No hay estudiante en el sistema")
 			}
-
 		case 3:
 			//Registrar nuevo estudiante
 			s := bufio.NewScanner(os.Stdin)
@@ -143,6 +141,10 @@ loopMenu:
 			fmt.Println("Estudiante agregado a lista de espera ...")
 		case 4:
 			//carga masiva
+			ruta := ""
+			fmt.Print("Ingrese la ruta del archivo: ")
+			fmt.Scanln(&ruta)
+			CargaMasivaEstudiantes(ruta)
 		case 5:
 			//Menu de reportes
 			menuReportes()
@@ -222,7 +224,7 @@ loopMenu:
 			if COLA_PENDIENTES.Size() == 0 {
 				fmt.Println("Lista vacía")
 			}
-			LISTA_SISTEMA.Graficar("Lista_Sistema")
+			LISTA_SISTEMA.Graficar("Estudiantes registrados")
 			//openImage(nombreArchivo)
 
 		case 2:
@@ -230,7 +232,7 @@ loopMenu:
 			if COLA_PENDIENTES.Size() == 0 {
 				fmt.Println("Cola vacía")
 			}
-			COLA_PENDIENTES.Graficar("Cola_Espera")
+			COLA_PENDIENTES.Graficar("Estudiantes pendientes")
 			//openImage(nombreArchivo)
 
 		case 3:
@@ -238,7 +240,7 @@ loopMenu:
 			if COLA_PENDIENTES.Size() == 0 {
 				fmt.Println("Pila vacía")
 			}
-			PILA_REGISTRO.Graficar("Pila_Registro")
+			PILA_REGISTRO.Graficar("Reporte administrador")
 			//openImage(nombreArchivo)
 		case 4:
 			//reporte en JSON
@@ -344,7 +346,13 @@ loopMenu:
 			busqueda_bitacora.Print()
 			fmt.Printf("%s\n", strings.Repeat("*", 45))
 		case 2:
+			busqueda_bitacora := LISTA_SISTEMA.GetStackByCarnet(estudiante.GetCarnet())
 
+			if busqueda_bitacora.Size() > 0 {
+				busqueda_bitacora.Graficar("Bitacora")
+			} else {
+				fmt.Println("No hay registro")
+			}
 		case 3:
 			//Salir
 			fmt.Println("Cerrando sesión ...")
@@ -377,4 +385,38 @@ func openImage(nombreArchivo string) {
 		fmt.Println("error: ", err)
 	}
 	fmt.Println("resultado: ", cmd)
+}
+
+func CargaMasivaEstudiantes(ruta string) {
+	//abrir archivo
+	f, err := os.Open(ruta)
+	if err != nil {
+		fmt.Println("No se pudo abrir el archivo")
+		return
+	}
+	//cerrar el archivo
+	defer f.Close()
+	//lectura csv
+	csvReader := csv.NewReader(f)
+	contador := 0
+	for {
+
+		rec, err := csvReader.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			fmt.Println("No se pudo leer el CSV")
+		}
+		//lectura de lineas
+		//saltar encabezado
+		if contador > 0 {
+			carnet := rec[0]
+			nombre := rec[1]
+			password := rec[2]
+			estudiante_nuevo := est.New(nombre, "", carnet, password)
+			COLA_PENDIENTES.Add(estudiante_nuevo)
+		}
+		contador += 1
+	}
 }

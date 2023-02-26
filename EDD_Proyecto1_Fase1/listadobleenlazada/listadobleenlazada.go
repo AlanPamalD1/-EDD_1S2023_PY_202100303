@@ -352,15 +352,15 @@ func (l *ListaDoble) Graficar(nombreArchivo string) {
 	concatenarNodos += "nodonull2;"
 	texto += fmt.Sprintf("	{ rank=source; %s}\n", concatenarNodos)
 
-	texto += "	nodonull1 -> nodo0;\n"
-
-	for i := 0; i < l.Size()-1; i++ {
-		c = i + 1
-		texto += fmt.Sprintf("	nodo%d -> nodo%d;\n", i, c)
-		texto += fmt.Sprintf("	nodo%d -> nodo%d;\n", c, i)
+	if l.Size() > 0 {
+		texto += "	nodonull1 -> nodo0;\n"
+		for i := 0; i < l.Size()-1; i++ {
+			c = i + 1
+			texto += fmt.Sprintf("	nodo%d -> nodo%d;\n", i, c)
+			texto += fmt.Sprintf("	nodo%d -> nodo%d;\n", c, i)
+		}
+		texto += fmt.Sprintf("	nodo%d -> nodonull2;\n", c)
 	}
-
-	texto += fmt.Sprintf("	nodo%d -> nodonull2;\n", c)
 
 	auxiliar = l.cabeza
 	for i := 0; i < l.Size(); i++ {
