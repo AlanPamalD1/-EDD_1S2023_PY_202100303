@@ -1,19 +1,17 @@
 package pilabitacora
 
 import (
-	est "estudiante"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
-	"strconv"
 	"strings"
 	"time"
 )
 
 type Nodo struct {
-	next  *Nodo
-	value *est.Estudiante
+	next *Nodo
+	//value *est.Estudiante
 	fecha string
 	hora  string
 }
@@ -24,7 +22,7 @@ type Pila struct {
 
 // Constructores
 
-func NuevaPila() *Pila {
+func New() *Pila {
 	p := new(Pila)
 	p.cabeza = nil
 	return p
@@ -32,12 +30,12 @@ func NuevaPila() *Pila {
 
 // Insertar datos
 
-func (p *Pila) Push(e *est.Estudiante) {
+func (p *Pila) Push( /*e *est.Estudiante */ ) {
 	now := time.Now()
 	nodo := &Nodo{
-		value: e,
-		fecha: now.Format(time.Kitchen),
-		hora:  now.Format("2006-02-01"),
+		//value: e,
+		hora:  now.Format(time.Kitchen),
+		fecha: now.Format("2006-02-01"),
 	}
 	if p.cabeza == nil {
 		p.cabeza = nodo
@@ -59,17 +57,6 @@ func (l *Pila) Size() int {
 	return tamanio
 }
 
-func (l *Pila) Exist(carnet string) bool {
-	nodoActual := l.cabeza
-	for nodoActual != nil {
-		if nodoActual.value.GetCarnet() == carnet {
-			return true
-		}
-		nodoActual = nodoActual.next
-	}
-	return false
-}
-
 func (p *Pila) Print() {
 
 	if p.cabeza == nil {
@@ -80,7 +67,8 @@ func (p *Pila) Print() {
 	actual := p.cabeza
 
 	for actual != nil {
-		actual.value.Print()
+		//actual.value.Print()
+		fmt.Printf("Hora: %s Fecha: %s\n", actual.hora, actual.fecha)
 		actual = actual.next
 		fmt.Printf("%s\n", strings.Repeat("-", 45))
 	}
@@ -88,13 +76,37 @@ func (p *Pila) Print() {
 
 // Eleminar datos
 
-func (p *Pila) Pop() *est.Estudiante {
+func (p *Pila) Pop() /* *est.Estudiante */ {
 	if p.cabeza == nil {
-		return nil
+		return
 	}
-	e := p.cabeza.value
+	//e := p.cabeza.value
 	p.cabeza = p.cabeza.next
-	return e
+	//return e
+}
+
+func (p *Pila) Subgrafo(i int) string {
+	texto := ""
+	auxiliar := p.cabeza
+
+	for j := 0; j < p.Size(); j++ {
+		texto += fmt.Sprintf("	nodo%db%d[label=\"Se inició sesión en\\n%s %s\"];\n", i, j, auxiliar.fecha, auxiliar.hora)
+		auxiliar = auxiliar.next
+	}
+
+	return texto
+}
+
+func (p *Pila) UnionSubgrafos(i int) string {
+	if p.Size() > 0 {
+		texto := fmt.Sprintf("	nodo%d -> nodo%db%d;\n", i, i, 0)
+
+		for j := 0; j < p.Size()-1; j++ {
+			texto += fmt.Sprintf("	nodo%db%d -> nodo%db%d;\n", i, j, i, (j + 1))
+		}
+		return texto
+	}
+	return ""
 }
 
 // Creación archivos dot
@@ -129,7 +141,6 @@ func escribirArchivoDot(contenido string, nombre_archivo string) {
 	if err != nil {
 		return
 	}
-	fmt.Printf("Archivo %s creado exitosamente\n", nombre_archivo)
 }
 
 func ejecutar(nombre_imagen string, archivo_dot string) {
@@ -137,31 +148,25 @@ func ejecutar(nombre_imagen string, archivo_dot string) {
 	cmd, _ := exec.Command(path, "-Tjpg", archivo_dot).Output()
 	mode := 0777
 	_ = ioutil.WriteFile(nombre_imagen, cmd, os.FileMode(mode))
+	fmt.Printf("Archivo %s.jpg creado exitosamente\n", nombre_imagen)
 }
 
-func (l *Pila) Graficar(nombreArchivo string) {
+func (p *Pila) Graficar(nombreArchivo string) {
 	nombre_archivo_dot := fmt.Sprintf("./%s.dot", nombreArchivo)
 	nombre_imagen := fmt.Sprintf("%s.jpg", nombreArchivo)
 	texto := "digraph lista{\n"
-	texto += "rankdir=LR;\n"
-	texto += "quiver -> \"0.5\";\n"
-	texto += "node[shape = square];\n"
-	//texto += "nodonull1[label=\"null\"];\n"
-	//texto += "nodonull2[label=\"null\"];\n"
-	auxiliar := l.cabeza
-	//contador := 0
-	for i := 0; i < l.Size(); i++ {
-		texto += fmt.Sprintf("nodo%s[label=\"{|%s\\n%s|}\"];\n", strconv.Itoa(i), auxiliar.value.GetCarnet(), auxiliar.value.GetNombre())
+	texto += "	rankdir=TB;\n"
+	texto += "	node[shape = rectangle];\n"
+	texto += "	ranksep=\"0.02 equally\";\n"
+	texto += "	edge [style=\"invis\"];\n"
+	auxiliar := p.cabeza
+	for i := 0; i < p.Size(); i++ {
+		texto += fmt.Sprintf("	nodo%d[label=\"Se inició sesión en\\n%s %s\"];\n", i, auxiliar.fecha, auxiliar.hora)
 		auxiliar = auxiliar.next
 	}
-	//texto += "nodonull1->nodo0 [dir=back];\n"
-	for i := 0; i < l.Size()-1; i++ {
-		c := i + 1
-		texto += "nodo" + strconv.Itoa(i) + "->nodo" + strconv.Itoa(c) + "[dir=none];\n"
-		//texto += "nodo" + strconv.Itoa(c) + "->nodo" + strconv.Itoa(i) + ";\n"
-		//contador = c
+	for i := 0; i < p.Size()-1; i++ {
+		texto += fmt.Sprintf("	nodo%d -> nodo%d;\n", i, i+1)
 	}
-	//texto += "nodo" + strconv.Itoa(contador) + "->nodonull2;\n"
 	texto += "}"
 
 	crearArchivoDot(nombre_archivo_dot)

@@ -135,7 +135,6 @@ func escribirArchivoDot(contenido string, nombre_archivo string) {
 	if err != nil {
 		return
 	}
-	fmt.Printf("Archivo %s creado exitosamente\n", nombre_archivo)
 }
 
 func ejecutar(nombre_imagen string, archivo_dot string) {
@@ -143,22 +142,23 @@ func ejecutar(nombre_imagen string, archivo_dot string) {
 	cmd, _ := exec.Command(path, "-Tjpg", archivo_dot).Output()
 	mode := 0777
 	_ = ioutil.WriteFile(nombre_imagen, cmd, os.FileMode(mode))
+	fmt.Printf("Archivo %s.jpg creado exitosamente\n", nombre_imagen)
 }
 
 func (l *Pila) Graficar(nombreArchivo string) {
 	nombre_archivo_dot := fmt.Sprintf("./%s.dot", nombreArchivo)
 	nombre_imagen := fmt.Sprintf("%s.jpg", nombreArchivo)
 	texto := "digraph lista{\n"
-	texto += "nodesep=0;\n"
-	texto += "rankdir=TB;\n"
-	texto += "node[shape = rectangle];\n"
+	texto += "	rankdir=TB;\n"
+	texto += "	node[shape = rectangle];\n"
+	texto += "	ranksep=\"0.05 equally\";\n"
 	auxiliar := l.cabeza
 	for i := 0; i < l.Size(); i++ {
-		texto += fmt.Sprintf("nodo%s[label=\"Se %s a\\n%s %s\\n %s %s\"];\n", strconv.Itoa(i), auxiliar.aceptacion, auxiliar.value.GetNombre(), auxiliar.value.GetApellido(), auxiliar.fecha, auxiliar.hora)
+		texto += fmt.Sprintf("	nodo%s[label=\"Se %s a\\n%s %s\\n %s %s\"];\n", strconv.Itoa(i), auxiliar.aceptacion, auxiliar.value.GetNombre(), auxiliar.value.GetApellido(), auxiliar.fecha, auxiliar.hora)
 		auxiliar = auxiliar.next
 	}
 	for i := 0; i < l.Size()-1; i++ {
-		texto += "nodo" + strconv.Itoa(i) + "->nodo" + strconv.Itoa(i+1) + ";\n"
+		texto += fmt.Sprintf("	nodo%d -> nodo%d;\n", i, i+1)
 	}
 	texto += "}"
 

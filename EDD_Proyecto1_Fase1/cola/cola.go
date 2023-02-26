@@ -176,7 +176,6 @@ func escribirArchivoDot(contenido string, nombre_archivo string) {
 	if err != nil {
 		return
 	}
-	fmt.Printf("Archivo %s creado exitosamente\n", nombre_archivo)
 }
 
 func ejecutar(nombre_imagen string, archivo_dot string) {
@@ -184,6 +183,7 @@ func ejecutar(nombre_imagen string, archivo_dot string) {
 	cmd, _ := exec.Command(path, "-Tjpg", archivo_dot).Output()
 	mode := 0777
 	_ = ioutil.WriteFile(nombre_imagen, cmd, os.FileMode(mode))
+	fmt.Printf("Archivo %s.jpg creado exitosamente\n", nombre_imagen)
 }
 
 func (l *Cola) Graficar(nombreArchivo string) {
@@ -191,15 +191,15 @@ func (l *Cola) Graficar(nombreArchivo string) {
 	nombre_archivo_dot := fmt.Sprintf("./%s.dot", nombreArchivo)
 	nombre_imagen := fmt.Sprintf("%s.jpg", nombreArchivo)
 	texto := "digraph cola{\n"
-	texto += "rankdir=LR;\n"
-	texto += "node[shape = rectangle];\n"
+	texto += "	rankdir=LR;\n"
+	texto += "	node[shape = rectangle];\n"
 	auxiliar := l.cabeza
 	for i := 0; i < l.Size(); i++ {
-		texto += fmt.Sprintf("nodo%s[label=\"%s\\n%s %s\"];\n", strconv.Itoa(i), auxiliar.value.GetCarnet(), auxiliar.value.GetNombre(), auxiliar.value.GetApellido())
+		texto += fmt.Sprintf("	nodo%s[label=\"%s\\n%s %s\"];\n", strconv.Itoa(i), auxiliar.value.GetCarnet(), auxiliar.value.GetNombre(), auxiliar.value.GetApellido())
 		auxiliar = auxiliar.next
 	}
 	for i := 0; i < l.Size()-1; i++ {
-		texto += "nodo" + strconv.Itoa(i) + "->nodo" + strconv.Itoa(i+1) + ";\n"
+		texto += fmt.Sprintf("	nodo%d -> nodo%d;\n", i, i+1)
 	}
 	texto += "}"
 

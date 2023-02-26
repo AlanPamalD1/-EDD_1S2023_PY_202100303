@@ -6,14 +6,15 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
-	"strconv"
+	plbtc "pilabitacora"
 	"strings"
 )
 
 type Nodo struct {
-	next   *Nodo
-	before *Nodo
-	value  *est.Estudiante
+	next     *Nodo
+	before   *Nodo
+	value    *est.Estudiante
+	bitacora *plbtc.Pila
 }
 
 type ListaDoble struct {
@@ -32,9 +33,10 @@ func New() *ListaDoble {
 
 // Insertar datos
 
-func (l *ListaDoble) AddFirst(estudiante *est.Estudiante) {
+func (l *ListaDoble) AddFirst(estudiante *est.Estudiante, bitacora *plbtc.Pila) {
 	nodo := &Nodo{
-		value: estudiante,
+		value:    estudiante,
+		bitacora: bitacora,
 	}
 	if l.cabeza == nil {
 		l.cabeza = nodo
@@ -46,9 +48,10 @@ func (l *ListaDoble) AddFirst(estudiante *est.Estudiante) {
 	}
 }
 
-func (l *ListaDoble) AddLast(estudiante *est.Estudiante) {
+func (l *ListaDoble) AddLast(estudiante *est.Estudiante, bitacora *plbtc.Pila) {
 	nodo := &Nodo{
-		value: estudiante,
+		value:    estudiante,
+		bitacora: bitacora,
 	}
 	if l.cola == nil {
 		l.cabeza = nodo
@@ -60,17 +63,17 @@ func (l *ListaDoble) AddLast(estudiante *est.Estudiante) {
 	}
 }
 
-func (l *ListaDoble) AddInPos(posicion int, estudiante *est.Estudiante) bool {
+func (l *ListaDoble) AddInPos(posicion int, estudiante *est.Estudiante, bitacora *plbtc.Pila) bool {
 	if posicion < 0 {
 		return false
 	}
 
 	if posicion == 0 {
-		l.AddFirst(estudiante)
+		l.AddFirst(estudiante, bitacora)
 		return true
 	}
 
-	nodo := &Nodo{value: estudiante}
+	nodo := &Nodo{value: estudiante, bitacora: bitacora}
 	actual := l.cabeza
 
 	for i := 0; i < posicion-1; i++ {
@@ -80,7 +83,7 @@ func (l *ListaDoble) AddInPos(posicion int, estudiante *est.Estudiante) bool {
 		actual = actual.next
 	}
 	if actual == nil {
-		l.AddLast(estudiante)
+		l.AddLast(estudiante, bitacora)
 		return true
 	}
 	nodo.next = actual.next
@@ -117,10 +120,32 @@ func (l *ListaDoble) Exist(carnet string) bool {
 	return false
 }
 
+func (l *ListaDoble) GetStudentByCarnet(carnet string) *est.Estudiante {
+	nodoActual := l.cabeza
+	for nodoActual != nil {
+		if nodoActual.value.GetCarnet() == carnet {
+			return nodoActual.value
+		}
+		nodoActual = nodoActual.next
+	}
+	return nil
+}
+
+func (l *ListaDoble) GetStackByCarnet(carnet string) *plbtc.Pila {
+	nodoActual := l.cabeza
+	for nodoActual != nil {
+		if nodoActual.value.GetCarnet() == carnet {
+			return nodoActual.bitacora
+		}
+		nodoActual = nodoActual.next
+	}
+	return nil
+}
+
 func (l *ListaDoble) Print() {
 
 	if l.cabeza == nil {
-		fmt.Println("Cola vacía")
+		fmt.Println("Lista vacía")
 		return
 	}
 	nodoActual := l.cabeza
@@ -294,7 +319,6 @@ func escribirArchivoDot(contenido string, nombre_archivo string) {
 	if err != nil {
 		return
 	}
-	fmt.Printf("Archivo %s creado exitosamente\n", nombre_archivo)
 }
 
 func ejecutar(nombre_imagen string, archivo_dot string) {
@@ -302,30 +326,48 @@ func ejecutar(nombre_imagen string, archivo_dot string) {
 	cmd, _ := exec.Command(path, "-Tjpg", archivo_dot).Output()
 	mode := 0777
 	_ = ioutil.WriteFile(nombre_imagen, cmd, os.FileMode(mode))
+	fmt.Printf("Archivo %s.jpg creado exitosamente\n", nombre_imagen)
 }
 
 func (l *ListaDoble) Graficar(nombreArchivo string) {
 	nombre_archivo_dot := fmt.Sprintf("./%s.dot", nombreArchivo)
 	nombre_imagen := fmt.Sprintf("%s.jpg", nombreArchivo)
 	texto := "digraph lista{\n"
-	texto += "rankdir=LR;\n"
-	texto += "node[shape = record];\n"
-	texto += "nodonull1[label=\"null\"];\n"
-	texto += "nodonull2[label=\"null\"];\n"
+	texto += "	rankdir=TB;\n"
+	texto += "	node[shape = rectangle];\n"
+	texto += "	nodonull1[label=\"null\"];\n"
+	texto += "	nodonull2[label=\"null\"];\n"
 	auxiliar := l.cabeza
-	contador := 0
+	c := 0
+
+	concatenarNodos := "nodonull1;"
+
 	for i := 0; i < l.Size(); i++ {
-		texto += fmt.Sprintf("nodo%s[label=\"{|%s\\n%s %s|}\"];\n", strconv.Itoa(i), auxiliar.value.GetCarnet(), auxiliar.value.GetNombre(), auxiliar.value.GetApellido())
+		texto += fmt.Sprintf("	nodo%d[label=\"%s\\n%s %s\"];\n", i, auxiliar.value.GetCarnet(), auxiliar.value.GetNombre(), auxiliar.value.GetApellido())
+		texto += auxiliar.bitacora.Subgrafo(i)
+		concatenarNodos += fmt.Sprintf("nodo%d; ", i)
 		auxiliar = auxiliar.next
 	}
-	texto += "nodonull1->nodo0 [dir=back];\n"
+
+	concatenarNodos += "nodonull2;"
+	texto += fmt.Sprintf("	{ rank=source; %s}\n", concatenarNodos)
+
+	texto += "	nodonull1 -> nodo0;\n"
+
 	for i := 0; i < l.Size()-1; i++ {
-		c := i + 1
-		texto += "nodo" + strconv.Itoa(i) + "->nodo" + strconv.Itoa(c) + ";\n"
-		texto += "nodo" + strconv.Itoa(c) + "->nodo" + strconv.Itoa(i) + ";\n"
-		contador = c
+		c = i + 1
+		texto += fmt.Sprintf("	nodo%d -> nodo%d;\n", i, c)
+		texto += fmt.Sprintf("	nodo%d -> nodo%d;\n", c, i)
 	}
-	texto += "nodo" + strconv.Itoa(contador) + "->nodonull2;\n"
+
+	texto += fmt.Sprintf("	nodo%d -> nodonull2;\n", c)
+
+	auxiliar = l.cabeza
+	for i := 0; i < l.Size(); i++ {
+		texto += auxiliar.bitacora.UnionSubgrafos(i)
+		auxiliar = auxiliar.next
+	}
+
 	texto += "}"
 
 	crearArchivoDot(nombre_archivo_dot)
