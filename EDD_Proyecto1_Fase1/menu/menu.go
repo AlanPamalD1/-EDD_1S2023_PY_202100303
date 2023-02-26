@@ -25,15 +25,6 @@ var PILA_REGISTRO = plreg.New()
 //Estudiantes de prueba
 
 func main() {
-	//pruebaEst := est.New("Alan Rodrigo", "Pamal De León", "202100303", "12345")
-	//pruebaEst2 := est.New("Diego Eduardo", "Cifuentes Mazariegos", "202100304", "54321")
-	//pruebaEst3 := est.New("Luis Alejandro", "Perez Borja", "202100305", "00000")
-	//pruebaEst4 := est.New("Sergio Alejandro", "García Nose", "202100302", "panqueue")
-	//COLA_PENDIENTES.Add(pruebaEst4)
-	//COLA_PENDIENTES.Add(pruebaEst)
-	//COLA_PENDIENTES.Add(pruebaEst2)
-	//COLA_PENDIENTES.Add(pruebaEst3)
-	//menuAdmin()
 	menuInicioSesion()
 }
 
@@ -111,6 +102,8 @@ loopMenu:
 				fmt.Println("Error en entrada", err)
 			}
 
+			nombre += apellido
+
 			fmt.Print("Ingrese el carnet: ")
 			fmt.Scanln(&carnet)
 
@@ -125,7 +118,7 @@ loopMenu:
 						break
 					}
 					err = fmt.Errorf(
-						"El apellido debe de tener por lo menos %d caracteres",
+						"La contraseña debe de tener por lo menos %d caracteres",
 						min,
 					)
 				}
@@ -133,7 +126,7 @@ loopMenu:
 			}
 
 			//Creacion Estudiante
-			objeto := est.New(nombre, apellido, carnet, password)
+			objeto := est.New(nombre, carnet, password)
 
 			//Agregado lista espera
 			COLA_PENDIENTES.Add(objeto)
@@ -165,7 +158,7 @@ loop:
 		option := 0
 		fmt.Printf("\n************** Estudiantes pendientes: %d ****************\n", (COLA_PENDIENTES.Size()))
 		estudianteActual := COLA_PENDIENTES.Get(0)
-		fmt.Printf("Estudiante actual: %s %s\n", estudianteActual.GetNombre(), estudianteActual.GetApellido())
+		fmt.Printf("Estudiante actual: %s\n", estudianteActual.GetNombre())
 		fmt.Println("1. Aceptar al Estudiante")
 		fmt.Println("2. Rechazar al Estudiante")
 		fmt.Println("3. Volver al Menu")
@@ -185,12 +178,12 @@ loop:
 			LISTA_SISTEMA.SortByCarnet()
 			//Agregar al registro de la administrador
 			PILA_REGISTRO.Push(estudianteActual, true)
-			fmt.Printf("Se agregó a %s %s al sistema \n", estudianteActual.GetNombre(), estudianteActual.GetApellido())
+			fmt.Printf("Se agregó a %s al sistema \n", estudianteActual.GetNombre())
 		case 2:
 			//Rechazar
 			COLA_PENDIENTES.Dequeue()
 			PILA_REGISTRO.Push(estudianteActual, false)
-			fmt.Printf("Se rechazó a %s %s\n", estudianteActual.GetNombre(), estudianteActual.GetApellido())
+			fmt.Printf("Se rechazó a %s\n", estudianteActual.GetNombre())
 		case 3:
 			//Salir
 			fmt.Println("Regresando ...")
@@ -244,7 +237,7 @@ loopMenu:
 			//openImage(nombreArchivo)
 		case 4:
 			//reporte en JSON
-
+			GenerarJsonSistema("Reporte")
 		case 5:
 			//Regresar al menu administrador
 			fmt.Println("Regresando ...")
@@ -400,7 +393,6 @@ func CargaMasivaEstudiantes(ruta string) {
 	csvReader := csv.NewReader(f)
 	contador := 0
 	for {
-
 		rec, err := csvReader.Read()
 		if err == io.EOF {
 			break
@@ -414,9 +406,13 @@ func CargaMasivaEstudiantes(ruta string) {
 			carnet := rec[0]
 			nombre := rec[1]
 			password := rec[2]
-			estudiante_nuevo := est.New(nombre, "", carnet, password)
+			estudiante_nuevo := est.New(nombre, carnet, password)
 			COLA_PENDIENTES.Add(estudiante_nuevo)
 		}
 		contador += 1
 	}
+}
+
+func GenerarJsonSistema(nombre string) {
+	LISTA_SISTEMA.GenerarArchivoJSON(nombre)
 }

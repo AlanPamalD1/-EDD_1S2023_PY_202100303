@@ -1,6 +1,7 @@
 package listadobleenlazada
 
 import (
+	"encoding/json"
 	est "estudiante"
 	"fmt"
 	"io/ioutil"
@@ -343,7 +344,7 @@ func (l *ListaDoble) Graficar(nombreArchivo string) {
 	concatenarNodos := "nodonull1;"
 
 	for i := 0; i < l.Size(); i++ {
-		texto += fmt.Sprintf("	nodo%d[label=\"%s\\n%s %s\"];\n", i, auxiliar.value.GetCarnet(), auxiliar.value.GetNombre(), auxiliar.value.GetApellido())
+		texto += fmt.Sprintf("	nodo%d[label=\"%s\\n%s\"];\n", i, auxiliar.value.GetCarnet(), auxiliar.value.GetNombre())
 		texto += auxiliar.bitacora.Subgrafo(i)
 		concatenarNodos += fmt.Sprintf("nodo%d; ", i)
 		auxiliar = auxiliar.next
@@ -373,4 +374,45 @@ func (l *ListaDoble) Graficar(nombreArchivo string) {
 	crearArchivoDot(nombre_archivo_dot)
 	escribirArchivoDot(texto, nombre_archivo_dot)
 	ejecutar(nombre_imagen, nombre_archivo_dot)
+}
+
+func (l *ListaDoble) GenerarArchivoJSON(nombreArchivo string) error {
+	// Crear una estructura para guardar los estudiantes
+	type EstudianteJSON struct {
+		Nombre      string `json:"nombre"`
+		Carnet      string `json:"carnet"`
+		Password    string `json:"password"`
+		CarpetaRaiz string `json:"Carpeta_Raiz"`
+	}
+	// Crear una estructura para guardar el archivo JSON
+	type EstudiantesJSON struct {
+		Estudiantes []EstudianteJSON `json:"alumnos"`
+	}
+	// Recorrer la lista y guardar los estudiantes en la estructura
+	estudiantes := []EstudianteJSON{}
+	nodoActual := l.cabeza
+	for nodoActual != nil {
+		estudiante := nodoActual.value
+		estJSON := EstudianteJSON{
+			Nombre:      estudiante.GetNombre(),
+			Carnet:      estudiante.GetCarnet(),
+			Password:    estudiante.GetPassword(),
+			CarpetaRaiz: "/",
+		}
+		estudiantes = append(estudiantes, estJSON)
+		nodoActual = nodoActual.next
+	}
+	// Guardar la estructura en un archivo JSON
+	estudiantesJSON := EstudiantesJSON{
+		Estudiantes: estudiantes,
+	}
+	archivoJSON, err := json.MarshalIndent(estudiantesJSON, "", "  ")
+	if err != nil {
+		return err
+	}
+	err = ioutil.WriteFile(nombreArchivo+".json", archivoJSON, 0644)
+	if err != nil {
+		return err
+	}
+	return nil
 }

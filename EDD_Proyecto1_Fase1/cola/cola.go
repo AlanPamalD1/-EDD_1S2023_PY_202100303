@@ -195,7 +195,7 @@ func (l *Cola) Graficar(nombreArchivo string) {
 	texto += "	node[shape = rectangle];\n"
 	auxiliar := l.cabeza
 	for i := 0; i < l.Size(); i++ {
-		texto += fmt.Sprintf("	nodo%s[label=\"%s\\n%s %s\"];\n", strconv.Itoa(i), auxiliar.value.GetCarnet(), auxiliar.value.GetNombre(), auxiliar.value.GetApellido())
+		texto += fmt.Sprintf("	nodo%s[label=\"%s\\n%s\"];\n", strconv.Itoa(i), auxiliar.value.GetCarnet(), auxiliar.value.GetNombre())
 		auxiliar = auxiliar.next
 	}
 	for i := 0; i < l.Size()-1; i++ {

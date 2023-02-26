@@ -154,7 +154,7 @@ func (l *Pila) Graficar(nombreArchivo string) {
 	texto += "	ranksep=\"0.05 equally\";\n"
 	auxiliar := l.cabeza
 	for i := 0; i < l.Size(); i++ {
-		texto += fmt.Sprintf("	nodo%s[label=\"Se %s a\\n%s %s\\n %s %s\"];\n", strconv.Itoa(i), auxiliar.aceptacion, auxiliar.value.GetNombre(), auxiliar.value.GetApellido(), auxiliar.fecha, auxiliar.hora)
+		texto += fmt.Sprintf("	nodo%s[label=\"Se %s a\\n%s\\n %s %s\"];\n", strconv.Itoa(i), auxiliar.aceptacion, auxiliar.value.GetNombre(), auxiliar.fecha, auxiliar.hora)
 		auxiliar = auxiliar.next
 	}
 	for i := 0; i < l.Size()-1; i++ {
