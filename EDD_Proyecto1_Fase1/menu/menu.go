@@ -9,10 +9,11 @@ import (
 	"io"
 	lde "listadobleenlazada"
 	"os"
-	"os/exec"
+	"path/filepath"
 	plbtc "pilabitacora"
 	plreg "pilaregistro"
 	"strings"
+	"syscall"
 )
 
 var USER_ADMIN = "admin"
@@ -218,7 +219,7 @@ loopMenu:
 				fmt.Println("Lista vacía")
 			}
 			LISTA_SISTEMA.Graficar("Estudiantes registrados")
-			//openImage(nombreArchivo)
+			//openImage("Estudiantes registrados")
 
 		case 2:
 			//cola estudiantes en espera
@@ -226,7 +227,7 @@ loopMenu:
 				fmt.Println("Cola vacía")
 			}
 			COLA_PENDIENTES.Graficar("Estudiantes pendientes")
-			//openImage(nombreArchivo)
+			//openImage("Estudiantes pendientes")
 
 		case 3:
 			//reporte Administrador
@@ -234,7 +235,7 @@ loopMenu:
 				fmt.Println("Pila vacía")
 			}
 			PILA_REGISTRO.Graficar("Reporte administrador")
-			//openImage(nombreArchivo)
+			//openImage("Reporte administrador")
 		case 4:
 			//reporte en JSON
 			GenerarJsonSistema("Reporte")
@@ -343,6 +344,7 @@ loopMenu:
 
 			if busqueda_bitacora.Size() > 0 {
 				busqueda_bitacora.Graficar("Bitacora")
+				////openImage("Bitacora")
 			} else {
 				fmt.Println("No hay registro")
 			}
@@ -369,15 +371,13 @@ func scanString(s *bufio.Scanner) (string, error) {
 
 func openImage(nombreArchivo string) {
 
-	fmt.Printf("Abriendo el archivo %s.jpg\n", nombreArchivo)
-	path, _ := exec.LookPath("jpg")
-	nombreImagen := fmt.Sprintf("%s.jpg", nombreArchivo)
-	fmt.Println("ruta ", path, nombreImagen)
-	cmd, err := exec.Command(path, nombreImagen).Output()
-	if err != nil {
-		fmt.Println("error: ", err)
-	}
-	fmt.Println("resultado: ", cmd)
+	execFPath, _ := os.Executable()
+	execPath := filepath.Dir(execFPath)
+
+	var sI syscall.StartupInfo
+	var pI syscall.ProcessInformation
+	argv, _ := syscall.UTF16PtrFromString(os.Getenv("windir") + "\\system32\\cmd.exe /C " + fmt.Sprintf("\"%s\\%s.jpg\"", execPath, nombreArchivo))
+	syscall.CreateProcess(nil, argv, nil, nil, true, 0, nil, nil, &sI, &pI)
 }
 
 func CargaMasivaEstudiantes(ruta string) {
