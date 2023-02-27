@@ -151,7 +151,8 @@ func (l *Pila) Graficar(nombreArchivo string) {
 	texto := "digraph lista{\n"
 	texto += "	rankdir=TB;\n"
 	texto += "	node[shape = rectangle];\n"
-	texto += "	ranksep=\"0.05 equally\";\n"
+	texto += "	edge[arrowsize=0.5];\n"
+	texto += "	ranksep=\"0.2 equally\";\n"
 	auxiliar := l.cabeza
 	for i := 0; i < l.Size(); i++ {
 		texto += fmt.Sprintf("	nodo%s[label=\"Se %s a\\n%s\\n %s %s\"];\n", strconv.Itoa(i), auxiliar.aceptacion, auxiliar.value.GetNombre(), auxiliar.fecha, auxiliar.hora)

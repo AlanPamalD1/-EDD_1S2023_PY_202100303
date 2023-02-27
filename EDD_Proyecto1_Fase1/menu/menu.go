@@ -102,7 +102,7 @@ loopMenu:
 				fmt.Println("Error en entrada", err)
 			}
 
-			nombre += apellido
+			nombre += " " + apellido
 
 			fmt.Print("Ingrese el carnet: ")
 			fmt.Scanln(&carnet)
@@ -214,7 +214,7 @@ loopMenu:
 		switch option {
 		case 1:
 			//lista estudiantes aceptados
-			if COLA_PENDIENTES.Size() == 0 {
+			if LISTA_SISTEMA.Size() == 0 {
 				fmt.Println("Lista vacía")
 			}
 			LISTA_SISTEMA.Graficar("Estudiantes registrados")

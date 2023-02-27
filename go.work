@@ -1,0 +1,10 @@
+go 1.20
+
+use (
+	./EDD_Proyecto1_Fase1/cola
+	./EDD_Proyecto1_Fase1/estudiante
+	./EDD_Proyecto1_Fase1/listadobleenlazada
+	./EDD_Proyecto1_Fase1/menu
+	./EDD_Proyecto1_Fase1/pilabitacora
+	./EDD_Proyecto1_Fase1/pilaregistro
+)
