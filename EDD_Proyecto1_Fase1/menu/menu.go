@@ -35,12 +35,12 @@ loopMenu:
 		option := 0
 		fmt.Println()
 		fmt.Printf("*** %s ***\n", "Dashboard Administrador - EDD GoDrive")
-		fmt.Printf("*       %s       *\n", "1. Ver Estudiantes Pendientes")
-		fmt.Printf("*       %s      *\n", "2. Ver Estudiantes del Sistema")
-		fmt.Printf("*       %s       *\n", "3. Registrar Nuevo Estudiante")
-		fmt.Printf("*       %s      *\n", "4. Carga Masiva de Estudiantes")
+		fmt.Printf("*       %s       *\n", "1. Ver Estudiantes pendientes")
+		fmt.Printf("*       %s      *\n", "2. Ver Estudiantes del sistema")
+		fmt.Printf("*       %s       *\n", "3. Registrar nuevo estudiante")
+		fmt.Printf("*       %s      *\n", "4. Carga masiva de estudiantes")
 		fmt.Printf("*                %s                *\n", "5. Reportes")
-		fmt.Printf("*              %s             *\n", "6. Cerrar Sesión")
+		fmt.Printf("*              %s             *\n", "6. Cerrar sesión")
 		fmt.Printf("%s\n", strings.Repeat("*", 45))
 		fmt.Scanln(&option)
 		switch option {
@@ -150,7 +150,6 @@ loopMenu:
 			fmt.Println("Ingrese una opcíon válida")
 		}
 	}
-
 }
 
 func aceptarEstudiantes() {
@@ -160,9 +159,9 @@ loop:
 		fmt.Printf("\n************** Estudiantes pendientes: %d ****************\n", (COLA_PENDIENTES.Size()))
 		estudianteActual := COLA_PENDIENTES.Get(0)
 		fmt.Printf("Estudiante actual: %s\n", estudianteActual.GetNombre())
-		fmt.Println("1. Aceptar al Estudiante")
-		fmt.Println("2. Rechazar al Estudiante")
-		fmt.Println("3. Volver al Menu")
+		fmt.Println("1. Aceptar al estudiante")
+		fmt.Println("2. Rechazar al estudiante")
+		fmt.Println("3. Volver al menu")
 		fmt.Printf("%s\n", strings.Repeat("-", 55))
 		fmt.Print("Elige una opción: ")
 		fmt.Scanln(&option)
@@ -205,9 +204,9 @@ loopMenu:
 		option := 0
 		fmt.Println()
 		fmt.Printf("****** %s *******\n", "Área de Reportes - EDD GoDrive")
-		fmt.Printf("*         %s          *\n", "1. Estudiantes Aceptados")
-		fmt.Printf("*         %s          *\n", "2. Estudiantes en Espera")
-		fmt.Printf("*         %s          *\n", "3. Reporte Administrador")
+		fmt.Printf("*         %s          *\n", "1. Estudiantes en espera")
+		fmt.Printf("*        %s         *\n", "2. Estudiantes registrados")
+		fmt.Printf("*         %s          *\n", "3. Reporte administrador")
 		fmt.Printf("*                 %s                   *\n", "4. JSON")
 		fmt.Printf("*                %s                *\n", "5. Regresar")
 		fmt.Printf("%s\n", strings.Repeat("*", 45))
@@ -255,8 +254,8 @@ loopMenu:
 		option := 0
 		fmt.Println()
 		fmt.Printf("**************** %s ****************\n", "EDD GoDrive")
-		fmt.Printf("*             %s             *\n", "1. Iniciar Sesión")
-		fmt.Printf("*            %s           *\n", "2. Salir del Sistema")
+		fmt.Printf("*             %s             *\n", "1. Iniciar sesión")
+		fmt.Printf("*            %s           *\n", "2. Salir del sistema")
 		fmt.Printf("%s\n", strings.Repeat("*", 45))
 		fmt.Scanln(&option)
 		switch option {
@@ -327,8 +326,8 @@ loopMenu:
 		option := 0
 		fmt.Println()
 		fmt.Printf("**************** %s ****************\n", "EDD GoDrive")
-		fmt.Printf("*        %s         *\n", "1. Historial Inicio Sesión")
-		fmt.Printf("*           %s           *\n", "2. Graficar Historial")
+		fmt.Printf("*        %s         *\n", "1. Historial inicio sesión")
+		fmt.Printf("*          %s          *\n", "2. Graficar mi historial")
 		fmt.Printf("*              %s             *\n", "3. Cerrar Sesión")
 		fmt.Printf("%s\n", strings.Repeat("*", 45))
 		fmt.Scanln(&option)
@@ -411,6 +410,7 @@ func CargaMasivaEstudiantes(ruta string) {
 		}
 		contador += 1
 	}
+	fmt.Printf("Se agregó %d estudiantes a pendientes\n", (contador - 1))
 }
 
 func GenerarJsonSistema(nombre string) {

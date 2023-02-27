@@ -327,7 +327,7 @@ func ejecutar(nombre_imagen string, archivo_dot string) {
 	cmd, _ := exec.Command(path, "-Tjpg", archivo_dot).Output()
 	mode := 0777
 	_ = ioutil.WriteFile(nombre_imagen, cmd, os.FileMode(mode))
-	fmt.Printf("Archivo %s.jpg creado exitosamente\n", nombre_imagen)
+	fmt.Printf("Archivo %s creado exitosamente\n", nombre_imagen)
 }
 
 func (l *ListaDoble) Graficar(nombreArchivo string) {
@@ -342,19 +342,18 @@ func (l *ListaDoble) Graficar(nombreArchivo string) {
 	c := 0
 
 	concatenarNodos := "nodonull1;"
-
 	for i := 0; i < l.Size(); i++ {
 		texto += fmt.Sprintf("	nodo%d[label=\"%s\\n%s\"];\n", i, auxiliar.value.GetCarnet(), auxiliar.value.GetNombre())
 		texto += auxiliar.bitacora.Subgrafo(i)
 		concatenarNodos += fmt.Sprintf("nodo%d; ", i)
 		auxiliar = auxiliar.next
 	}
-
 	concatenarNodos += "nodonull2;"
+
 	texto += fmt.Sprintf("	{ rank=source; %s}\n", concatenarNodos)
 
 	if l.Size() > 0 {
-		texto += "	nodonull1 -> nodo0;\n"
+		texto += "	nodonull1 -> nodo0 [dir=back];\n"
 		for i := 0; i < l.Size()-1; i++ {
 			c = i + 1
 			texto += fmt.Sprintf("	nodo%d -> nodo%d;\n", i, c)

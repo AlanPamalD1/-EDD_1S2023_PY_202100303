@@ -183,7 +183,7 @@ func ejecutar(nombre_imagen string, archivo_dot string) {
 	cmd, _ := exec.Command(path, "-Tjpg", archivo_dot).Output()
 	mode := 0777
 	_ = ioutil.WriteFile(nombre_imagen, cmd, os.FileMode(mode))
-	fmt.Printf("Archivo %s.jpg creado exitosamente\n", nombre_imagen)
+	fmt.Printf("Archivo %s creado exitosamente\n", nombre_imagen)
 }
 
 func (l *Cola) Graficar(nombreArchivo string) {
@@ -193,14 +193,20 @@ func (l *Cola) Graficar(nombreArchivo string) {
 	texto := "digraph cola{\n"
 	texto += "	rankdir=LR;\n"
 	texto += "	node[shape = rectangle];\n"
+	texto += "	nodonull1[label=\"Entrada\"];\n"
 	auxiliar := l.cabeza
 	for i := 0; i < l.Size(); i++ {
 		texto += fmt.Sprintf("	nodo%s[label=\"%s\\n%s\"];\n", strconv.Itoa(i), auxiliar.value.GetCarnet(), auxiliar.value.GetNombre())
 		auxiliar = auxiliar.next
 	}
-	for i := 0; i < l.Size()-1; i++ {
-		texto += fmt.Sprintf("	nodo%d -> nodo%d;\n", i, i+1)
+
+	if l.Size() > 0 {
+		texto += "	nodonull1 -> nodo0;\n"
+		for i := 0; i < l.Size()-1; i++ {
+			texto += fmt.Sprintf("	nodo%d -> nodo%d;\n", i, i+1)
+		}
 	}
+
 	texto += "}"
 
 	crearArchivoDot(nombre_archivo_dot)
