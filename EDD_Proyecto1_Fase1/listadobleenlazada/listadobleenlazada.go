@@ -110,7 +110,7 @@ func (l *ListaDoble) Size() int {
 	return tamanio
 }
 
-func (l *ListaDoble) Exist(carnet string) bool {
+func (l *ListaDoble) ExistStudent(carnet string) bool {
 	nodoActual := l.cabeza
 	for nodoActual != nil {
 		if nodoActual.value.GetCarnet() == carnet {

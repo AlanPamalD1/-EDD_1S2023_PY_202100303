@@ -171,14 +171,23 @@ loop:
 			//Aceptar estudiante
 			//Quitar de cola de pendientes
 			COLA_PENDIENTES.Dequeue()
-			//Agregar a lista de sistema
-			pila_bitacora := plbtc.New()
-			LISTA_SISTEMA.AddFirst(estudianteActual, pila_bitacora)
-			//Ordenar datos
-			LISTA_SISTEMA.SortByCarnet()
-			//Agregar al registro de la administrador
-			PILA_REGISTRO.Push(estudianteActual, true)
-			fmt.Printf("Se agregó a %s al sistema \n", estudianteActual.GetNombre())
+
+			//Verificar estudiante repetido
+			if LISTA_SISTEMA.ExistStudent(estudianteActual.GetCarnet()) {
+				fmt.Printf("El estudiante con el carnet %s ya se encuentra registrado.\n", estudianteActual.GetCarnet())
+				fmt.Printf("%s\n", strings.Repeat("*", 55))
+			} else {
+				//Creación bitacora
+				pila_bitacora := plbtc.New()
+				//Añadir a la lista del sistema
+				LISTA_SISTEMA.AddFirst(estudianteActual, pila_bitacora)
+				//Ordenar datos
+				LISTA_SISTEMA.SortByCarnet()
+				//Agregar al registro de la administrador
+				PILA_REGISTRO.Push(estudianteActual, true)
+				fmt.Printf("Se agregó a %s al sistema \n", estudianteActual.GetNombre())
+			}
+
 		case 2:
 			//Rechazar
 			COLA_PENDIENTES.Dequeue()
@@ -213,20 +222,20 @@ loopMenu:
 		fmt.Scanln(&option)
 		switch option {
 		case 1:
-			//lista estudiantes aceptados
-			if LISTA_SISTEMA.Size() == 0 {
-				fmt.Println("Lista vacía")
-			}
-			LISTA_SISTEMA.Graficar("Estudiantes registrados")
-			//openImage("Estudiantes registrados")
-
-		case 2:
 			//cola estudiantes en espera
 			if COLA_PENDIENTES.Size() == 0 {
 				fmt.Println("Cola vacía")
 			}
 			COLA_PENDIENTES.Graficar("Estudiantes pendientes")
 			//openImage("Estudiantes pendientes")
+
+		case 2:
+			//lista estudiantes aceptados
+			if LISTA_SISTEMA.Size() == 0 {
+				fmt.Println("Lista vacía")
+			}
+			LISTA_SISTEMA.Graficar("Estudiantes registrados")
+			//openImage("Estudiantes registrados")
 
 		case 3:
 			//reporte Administrador
@@ -327,7 +336,7 @@ loopMenu:
 		fmt.Println()
 		fmt.Printf("**************** %s ****************\n", "EDD GoDrive")
 		fmt.Printf("*        %s         *\n", "1. Historial inicio sesión")
-		fmt.Printf("*          %s          *\n", "2. Graficar mi historial")
+		fmt.Printf("*          %s         *\n", "2. Graficar mi historial")
 		fmt.Printf("*              %s             *\n", "3. Cerrar Sesión")
 		fmt.Printf("%s\n", strings.Repeat("*", 45))
 		fmt.Scanln(&option)
@@ -342,7 +351,7 @@ loopMenu:
 			busqueda_bitacora := LISTA_SISTEMA.GetStackByCarnet(estudiante.GetCarnet())
 
 			if busqueda_bitacora.Size() > 0 {
-				busqueda_bitacora.Graficar("Bitacora")
+				busqueda_bitacora.Graficar(fmt.Sprintf("Bitacora %s", estudiante.GetCarnet()))
 				////openImage("Bitacora")
 			} else {
 				fmt.Println("No hay registro")

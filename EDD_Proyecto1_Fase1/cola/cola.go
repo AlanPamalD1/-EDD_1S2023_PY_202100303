@@ -56,7 +56,7 @@ func (c *Cola) Size() int {
 	return tamanio
 }
 
-func (c *Cola) Exist(carnet string) bool {
+func (c *Cola) ExistStudent(carnet string) bool {
 	nodoActual := c.cabeza
 	for nodoActual != nil {
 		if nodoActual.value.GetCarnet() == carnet {

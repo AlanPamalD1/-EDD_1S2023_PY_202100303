@@ -10,8 +10,7 @@ import (
 )
 
 type Nodo struct {
-	next *Nodo
-	//value *est.Estudiante
+	next  *Nodo
 	fecha string
 	hora  string
 }
